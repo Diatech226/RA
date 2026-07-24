@@ -7,23 +7,7 @@ This repository is a **defensive and educational modernization scaffold** for a 
 This project must not be used to build, deploy, or operate malware, spyware, covert remote-access tooling, or unauthorized device-control features.
 
 
-## Repository structure
 
-```text
-AndroRAT/
-├── README.md
-├── .gitignore
-├── .gitattributes
-├── doc/
-├── src/
-│   ├── Androrat/
-│   ├── AndroratServer/
-│   ├── InOut/
-│   └── api/
-└── Experiment/
-    ├── AndroratActivity/
-    └── InOut/
-```
 
 The directories are intentionally present as modernization boundaries, not as a request to recreate unsafe legacy behavior.
 
