@@ -1,0 +1,32 @@
+# Build outputs
+build/
+bin/
+/out/
+target/
+*.class
+*.jar
+*.war
+*.apk
+*.dex
+
+# Android / Java generated files
+gen/
+.gradle/
+local.properties
+proguard/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
