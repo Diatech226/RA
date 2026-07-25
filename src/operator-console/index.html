@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Console défensive de démonstration pour appareils explicitement enrôlés.">
+    <title>Sentinel Mobile — Vue d’ensemble</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Aller au contenu</a>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navigation principale">
+        <a class="brand" href="index.html" aria-label="Sentinel Mobile, accueil">
+          <span class="brand-mark" aria-hidden="true">S</span>
+          <span><strong>Sentinel</strong><small>Mobile Defense</small></span>
+        </a>
+
+        <nav>
+          <p class="nav-label">Espace de travail</p>
+          <a class="nav-item active" href="index.html" aria-current="page"><span aria-hidden="true">⌂</span> Vue d’ensemble</a>
+          <span class="nav-item muted" aria-disabled="true"><span aria-hidden="true">▣</span> Appareils <small>À venir</small></span>
+          <span class="nav-item muted" aria-disabled="true"><span aria-hidden="true">◇</span> Détections <small>À venir</small></span>
+          <span class="nav-item muted" aria-disabled="true"><span aria-hidden="true">◫</span> Politiques <small>À venir</small></span>
+          <p class="nav-label">Gouvernance</p>
+          <span class="nav-item muted" aria-disabled="true"><span aria-hidden="true">◷</span> Journal d’audit <small>À venir</small></span>
+        </nav>
+
+        <div class="scope-card">
+          <span class="status-dot" aria-hidden="true"></span>
+          <div><strong>Laboratoire défensif</strong><p>Données synthétiques uniquement</p></div>
+        </div>
+      </aside>
+
+      <main id="main-content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Console opérateur</p>
+            <h1>Vue d’ensemble</h1>
+          </div>
+          <div class="operator">
+            <span class="environment">ENV. DÉMO</span>
+            <span class="avatar" aria-hidden="true">AM</span>
+            <span><strong>Amine M.</strong><small>Analyste sécurité</small></span>
+          </div>
+        </header>
+
+        <section class="content" aria-labelledby="welcome-title">
+          <div class="welcome-row">
+            <div>
+              <p class="eyebrow">Samedi 25 juillet 2026</p>
+              <h2 id="welcome-title">Bonjour, Amine</h2>
+              <p>Voici l’état de votre parc mobile explicitement enrôlé.</p>
+            </div>
+            <button class="secondary-button" id="refresh-button" type="button"><span aria-hidden="true">↻</span> Actualiser</button>
+          </div>
+
+          <div class="notice" role="note">
+            <span class="notice-icon" aria-hidden="true">✓</span>
+            <div><strong>Environnement de démonstration sécurisé</strong><p>Cette interface utilise uniquement des données fictives. Aucune commande distante ni collecte sensible n’est disponible.</p></div>
+          </div>
+
+          <section class="metrics-grid" aria-label="Indicateurs du parc">
+            <article class="metric-card"><span class="metric-icon blue" aria-hidden="true">▣</span><div><p>Appareils enrôlés</p><strong>24</strong><small><b>+3</b> ce mois-ci</small></div></article>
+            <article class="metric-card"><span class="metric-icon green" aria-hidden="true">✓</span><div><p>Conformes</p><strong>21</strong><small>87,5 % du parc</small></div></article>
+            <article class="metric-card"><span class="metric-icon amber" aria-hidden="true">!</span><div><p>À examiner</p><strong>3</strong><small>Action recommandée</small></div></article>
+            <article class="metric-card"><span class="metric-icon violet" aria-hidden="true">◇</span><div><p>Détections (24 h)</p><strong>7</strong><small>2 priorités élevées</small></div></article>
+          </section>
+
+          <div class="dashboard-grid">
+            <section class="panel" aria-labelledby="posture-title">
+              <div class="panel-heading"><div><p class="eyebrow">Conformité</p><h3 id="posture-title">Posture du parc</h3></div><span class="trend">+4,2 %</span></div>
+              <div class="posture-content">
+                <div class="donut" role="img" aria-label="87,5 pour cent des appareils sont conformes"><span><strong>87,5 %</strong><small>conformes</small></span></div>
+                <ul class="legend">
+                  <li><span class="legend-dot compliant"></span><span>Conformes</span><strong>21</strong></li>
+                  <li><span class="legend-dot review"></span><span>À examiner</span><strong>3</strong></li>
+                  <li><span class="legend-dot inactive"></span><span>Hors ligne</span><strong>0</strong></li>
+                </ul>
+              </div>
+              <p class="panel-note">Évaluation fondée sur la version système, le chiffrement et le verrouillage d’écran.</p>
+            </section>
+
+            <section class="panel" aria-labelledby="activity-title">
+              <div class="panel-heading"><div><p class="eyebrow">Dernières 24 heures</p><h3 id="activity-title">Activité des détections</h3></div><span class="live"><i></i> En direct</span></div>
+              <div class="chart" role="img" aria-label="Graphique synthétique montrant sept détections durant les dernières 24 heures">
+                <div class="chart-grid"><span>8</span><span>6</span><span>4</span><span>2</span><span>0</span></div>
+                <svg viewBox="0 0 560 160" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6558e8" stop-opacity=".28"/><stop offset="1" stop-color="#6558e8" stop-opacity="0"/></linearGradient></defs><path class="area" d="M0 135 C55 130 70 105 115 115 S175 78 220 90 S285 105 330 72 S395 92 440 56 S510 64 560 25 L560 160 L0 160Z"/><path class="line" d="M0 135 C55 130 70 105 115 115 S175 78 220 90 S285 105 330 72 S395 92 440 56 S510 64 560 25"/></svg>
+                <div class="chart-labels"><span>00 h</span><span>04 h</span><span>08 h</span><span>12 h</span><span>16 h</span><span>20 h</span><span>24 h</span></div>
+              </div>
+            </section>
+          </div>
+
+          <section class="panel alerts-panel" aria-labelledby="alerts-title">
+            <div class="panel-heading">
+              <div><p class="eyebrow">Triage défensif</p><h3 id="alerts-title">Alertes récentes</h3></div>
+              <div class="filters" aria-label="Filtrer les alertes">
+                <button class="filter active" type="button" data-filter="all" aria-pressed="true">Toutes</button>
+                <button class="filter" type="button" data-filter="high" aria-pressed="false">Priorité élevée</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th scope="col">Détection</th><th scope="col">Appareil</th><th scope="col">Priorité</th><th scope="col">Horodatage</th><th scope="col">État</th></tr></thead>
+                <tbody>
+                  <tr data-priority="high"><td><strong>Configuration de sécurité affaiblie</strong><small>Le verrouillage d’écran ne respecte plus la politique.</small></td><td>Pixel-Lab-07</td><td><span class="badge high">Élevée</span></td><td>Il y a 12 min</td><td><span class="state open">À examiner</span></td></tr>
+                  <tr data-priority="medium"><td><strong>Version système obsolète</strong><small>Correctif de sécurité dépassant le seuil défini.</small></td><td>Galaxy-Test-12</td><td><span class="badge medium">Moyenne</span></td><td>Il y a 47 min</td><td><span class="state progress">En cours</span></td></tr>
+                  <tr data-priority="high"><td><strong>Intégrité de l’appareil modifiée</strong><small>Signal synthétique généré par le simulateur de laboratoire.</small></td><td>Emulator-03</td><td><span class="badge high">Élevée</span></td><td>Il y a 2 h</td><td><span class="state resolved">Résolue</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p id="empty-state" class="empty-state" hidden>Aucune alerte ne correspond à ce filtre.</p>
+          </section>
+          <p class="updated" aria-live="polite">Dernière actualisation : <time id="last-updated">25/07/2026 à 09:42:18</time></p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
