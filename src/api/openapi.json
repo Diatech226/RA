@@ -1,0 +1,881 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "AndroRAT Defensive Modernization API",
+        "version": "0.1.0",
+        "description": "Safe defensive API contract for consent-based device enrollment, inventory, telemetry ingestion, policy compliance, and immutable audit trails. This contract intentionally excludes covert access, spyware, and unauthenticated command-and-control features."
+    },
+    "servers": [
+        {
+            "url": "https://api.example.invalid/v1",
+            "description": "Production placeholder"
+        },
+        {
+            "url": "http://localhost:8080/v1",
+            "description": "Local development"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ],
+    "paths": {
+        "/health": {
+            "get": {
+                "summary": "Check API availability",
+                "security": [],
+                "responses": {
+                    "200": {
+                        "description": "API is healthy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/token": {
+            "post": {
+                "summary": "Issue an operator access token",
+                "description": "Authenticates an approved operator. Implementations must enforce MFA and short token lifetimes.",
+                "security": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token issued",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthToken"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                }
+            }
+        },
+        "/devices/enrollments": {
+            "post": {
+                "summary": "Create a consent-based device enrollment",
+                "description": "Starts enrollment for a known organization user and returns a one-time enrollment token. No device is trusted until attestation and user consent are verified.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EnrollmentCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Enrollment created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Enrollment"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/ValidationError"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                }
+            }
+        },
+        "/devices": {
+            "get": {
+                "summary": "List enrolled devices",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/PageSize"
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/DeviceStatus"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Device page",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DevicePage"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                }
+            }
+        },
+        "/devices/{deviceId}": {
+            "get": {
+                "summary": "Get device inventory details",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/DeviceId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Device details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Device"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Revoke and offboard a device",
+                "description": "Revokes future telemetry submissions and records an audit event. This endpoint must not perform covert deletion or remote control on the device.",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/DeviceId"
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Revocation accepted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Revocation"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            }
+        },
+        "/telemetry/events": {
+            "post": {
+                "summary": "Ingest normalized defensive telemetry",
+                "description": "Accepts posture and compliance telemetry from an enrolled, authenticated agent. Replay protection is required through event IDs, timestamps, and transport authentication.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TelemetryBatch"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Telemetry accepted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngestionReceipt"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/ValidationError"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                }
+            }
+        },
+        "/policies": {
+            "get": {
+                "summary": "List policy definitions",
+                "responses": {
+                    "200": {
+                        "description": "Policy list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PolicyList"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a defensive policy",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PolicyCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Policy created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Policy"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                }
+            }
+        },
+        "/audit/events": {
+            "get": {
+                "summary": "Search immutable audit events",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/PageSize"
+                    },
+                    {
+                        "name": "actorId",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "resourceType",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Audit event page",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuditEventPage"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
+        "parameters": {
+            "DeviceId": {
+                "name": "deviceId",
+                "in": "path",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            },
+            "Page": {
+                "name": "page",
+                "in": "query",
+                "schema": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 1
+                }
+            },
+            "PageSize": {
+                "name": "pageSize",
+                "in": "query",
+                "schema": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "default": 25
+                }
+            }
+        },
+        "responses": {
+            "Unauthorized": {
+                "description": "Missing or invalid authentication"
+            },
+            "Forbidden": {
+                "description": "Authenticated principal is not authorized for this action"
+            },
+            "NotFound": {
+                "description": "Requested resource was not found"
+            },
+            "ValidationError": {
+                "description": "Request validation failed",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "HealthStatus": {
+                "type": "object",
+                "required": [
+                    "status",
+                    "checkedAt"
+                ],
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "ok"
+                        ]
+                    },
+                    "checkedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "AuthRequest": {
+                "type": "object",
+                "required": [
+                    "email",
+                    "password",
+                    "mfaCode"
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 12
+                    },
+                    "mfaCode": {
+                        "type": "string",
+                        "minLength": 6,
+                        "maxLength": 10
+                    }
+                }
+            },
+            "AuthToken": {
+                "type": "object",
+                "required": [
+                    "accessToken",
+                    "expiresAt",
+                    "tokenType"
+                ],
+                "properties": {
+                    "accessToken": {
+                        "type": "string"
+                    },
+                    "expiresAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "tokenType": {
+                        "type": "string",
+                        "const": "Bearer"
+                    }
+                }
+            },
+            "EnrollmentCreate": {
+                "type": "object",
+                "required": [
+                    "ownerEmail",
+                    "platform",
+                    "consentReference"
+                ],
+                "properties": {
+                    "ownerEmail": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "platform": {
+                        "type": "string",
+                        "enum": [
+                            "android"
+                        ]
+                    },
+                    "consentReference": {
+                        "type": "string",
+                        "description": "Reference to a signed consent or approved device-management record."
+                    },
+                    "labels": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "maxItems": 20
+                    }
+                }
+            },
+            "Enrollment": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/EnrollmentCreate"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "status",
+                            "expiresAt"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "status": {
+                                "type": "string",
+                                "enum": [
+                                    "pending",
+                                    "completed",
+                                    "expired",
+                                    "revoked"
+                                ]
+                            },
+                            "expiresAt": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "oneTimeToken": {
+                                "type": "string",
+                                "writeOnly": true
+                            }
+                        }
+                    }
+                ]
+            },
+            "DeviceStatus": {
+                "type": "string",
+                "enum": [
+                    "active",
+                    "quarantined",
+                    "revoked",
+                    "pending_attestation"
+                ]
+            },
+            "Device": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "ownerEmail",
+                    "platform",
+                    "status",
+                    "enrolledAt",
+                    "lastSeenAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "ownerEmail": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "platform": {
+                        "type": "string",
+                        "enum": [
+                            "android"
+                        ]
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/DeviceStatus"
+                    },
+                    "model": {
+                        "type": "string"
+                    },
+                    "osVersion": {
+                        "type": "string"
+                    },
+                    "agentVersion": {
+                        "type": "string"
+                    },
+                    "enrolledAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "lastSeenAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "DevicePage": {
+                "type": "object",
+                "required": [
+                    "items",
+                    "page",
+                    "pageSize",
+                    "total"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Device"
+                        }
+                    },
+                    "page": {
+                        "type": "integer"
+                    },
+                    "pageSize": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "TelemetryBatch": {
+                "type": "object",
+                "required": [
+                    "deviceId",
+                    "events"
+                ],
+                "properties": {
+                    "deviceId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "events": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 500,
+                        "items": {
+                            "$ref": "#/components/schemas/TelemetryEvent"
+                        }
+                    }
+                }
+            },
+            "TelemetryEvent": {
+                "type": "object",
+                "required": [
+                    "eventId",
+                    "observedAt",
+                    "type",
+                    "severity",
+                    "payload"
+                ],
+                "properties": {
+                    "eventId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "observedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "device.posture",
+                            "policy.compliance",
+                            "agent.health",
+                            "security.signal"
+                        ]
+                    },
+                    "severity": {
+                        "type": "string",
+                        "enum": [
+                            "info",
+                            "low",
+                            "medium",
+                            "high",
+                            "critical"
+                        ]
+                    },
+                    "payload": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            },
+            "IngestionReceipt": {
+                "type": "object",
+                "required": [
+                    "accepted",
+                    "rejected",
+                    "receivedAt"
+                ],
+                "properties": {
+                    "accepted": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "rejected": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "receivedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "PolicyCreate": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "description",
+                    "rules"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 120
+                    },
+                    "description": {
+                        "type": "string",
+                        "minLength": 10
+                    },
+                    "rules": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                            "$ref": "#/components/schemas/PolicyRule"
+                        }
+                    }
+                }
+            },
+            "Policy": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/PolicyCreate"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "version",
+                            "createdAt"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "version": {
+                                "type": "integer",
+                                "minimum": 1
+                            },
+                            "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    }
+                ]
+            },
+            "PolicyRule": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "operator",
+                    "value"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    },
+                    "operator": {
+                        "type": "string",
+                        "enum": [
+                            "equals",
+                            "not_equals",
+                            "contains",
+                            "greater_than",
+                            "less_than"
+                        ]
+                    },
+                    "value": {
+                        "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                        ]
+                    }
+                }
+            },
+            "PolicyList": {
+                "type": "object",
+                "required": [
+                    "items"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Policy"
+                        }
+                    }
+                }
+            },
+            "AuditEventPage": {
+                "type": "object",
+                "required": [
+                    "items",
+                    "page",
+                    "pageSize",
+                    "total"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AuditEvent"
+                        }
+                    },
+                    "page": {
+                        "type": "integer"
+                    },
+                    "pageSize": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "AuditEvent": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "occurredAt",
+                    "actorId",
+                    "action",
+                    "resourceType",
+                    "resourceId",
+                    "integrityHash"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "occurredAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "actorId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "action": {
+                        "type": "string"
+                    },
+                    "resourceType": {
+                        "type": "string"
+                    },
+                    "resourceId": {
+                        "type": "string"
+                    },
+                    "integrityHash": {
+                        "type": "string",
+                        "description": "Hash chaining value or immutable ledger reference."
+                    }
+                }
+            },
+            "Revocation": {
+                "type": "object",
+                "required": [
+                    "deviceId",
+                    "status",
+                    "revokedAt"
+                ],
+                "properties": {
+                    "deviceId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "status": {
+                        "type": "string",
+                        "const": "revoked"
+                    },
+                    "revokedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "required": [
+                    "code",
+                    "message"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "details": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
